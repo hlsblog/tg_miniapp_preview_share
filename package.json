@@ -1,0 +1,18 @@
+{
+  "name": "tg-bot-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "share-api.js",
+  "scripts": {
+    "start": "node share-api.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.19.2",
+    "node-fetch": "^2.6.7"
+  }
+}

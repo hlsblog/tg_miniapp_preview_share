@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Prepared Message Sender</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f0f2f5; color: #1c1e21; }
+        .container { text-align: center; padding: 20px; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { font-size: 24px; margin-bottom: 20px; }
+        button { background-color: #007bff; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 6px; cursor: pointer; transition: background-color 0.3s; }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #cccccc; cursor: not-allowed; }
+        #status { margin-top: 20px; font-size: 14px; color: #666; min-height: 20px; }
+        .error { color: #dc3545; }
+        .success { color: #28a745; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>直接发送预准备消息</h1>
+        <p>点击下面的按钮，将直接发送一条预先定义好的消息。</p>
+        <button id="sendButton">🚀 直接发送</button>
+        <div id="status">请在 Telegram Web App 环境中打开此页面。</div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            const sendButton = document.getElementById('sendButton');
+            const statusDiv = document.getElementById('status');
+            const tg = window.Telegram.WebApp;
+            const baseTg = window.Telegram;
+            const tgWebview = window.Telegram.WebView;
+
+            // API 服务器地址
+            const API_BASE_URL = 'http://localhost:3000';
+
+            try {
+                tg.ready(); // 告知 Telegram Web App 已准备就绪
+                sendButton.disabled = false;
+                statusDiv.textContent = '✅ Web App 已就绪，请点击按钮开始分享。';
+            } catch (error) {
+                statusDiv.innerHTML = '❌ <b>错误：</b>请在 Telegram Web App 环境中打开此页面。';
+                console.error('Telegram Web App 初始化失败:', error);
+                return;
+            }
+
+            sendButton.addEventListener('click', async () => {
+                statusDiv.textContent = '⏳ 正在准备图文消息...';
+                sendButton.disabled = true;
+
+                try {
+                    // 1. 调用后端 API，模拟“保存”图文消息到 TG 平台，并获取 msg_id
+                    const response = await fetch(`${API_BASE_URL}/api/save-inline-photo`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ user_id: tg.initDataUnsafe.user.id }) // 此接口需要 user_id 参数
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success && data.msg_id) {
+                        const msgId = data.msg_id;
+                        statusDiv.innerHTML = `✅ 图文消息已准备，msg_id: ${msgId}`;
+
+                        // 2. 通过事件调起对话框，显示预览内容
+                        statusDiv.innerHTML += '<br>🚀 正在调起分享对话框...';
+                        if (tgWebview && typeof tgWebview.postEvent === 'function') {
+                            tgWebview.postEvent('web_app_send_prepared_message', false, { id: msgId });
+                            statusDiv.innerHTML += '<br>✅ 分享对话框已调起！';
+                            // 可选：分享完成后关闭 Web App
+                            // setTimeout(() => tg.close(), 2000);
+                        } else {
+                            throw new Error('tgWebview.postEvent 不可用。');
+                        }
+
+                    } else {
+                        throw new Error(data.error || '无法准备图文消息。');
+                    }
+
+                } catch (error) {
+                    console.error('操作失败:', error);
+                    statusDiv.classList.add('error');
+                    statusDiv.textContent = `❌ 操作失败: ${error.message}`;
+                } finally {
+                    sendButton.disabled = false; // 恢复按钮状态
+                }
+            });
+        }
+    </script>
+</body>
+</html>
