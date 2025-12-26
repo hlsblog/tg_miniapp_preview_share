@@ -70,43 +70,6 @@ async function callTelegramApi(method, params) {
     }
 }
 
-// API 路由：准备并发送一条图片消息
-app.post('/api/prepare-message', async (req, res) => {
-    const { chat_id } = req.body;
-
-    if (!chat_id) {
-        return res.status(400).json({ success: false, error: 'chat_id 是必填项' });
-    }
-
-    // 定义要发送的图文消息内容
-    const photoMessage = {
-        photo: 'https://picsum.photos/id/237/600/400',
-        caption: '这是通过 Mini App 准备分享的图片！'
-    };
-
-    try {
-        const params = {
-            chat_id: chat_id,
-            photo: photoMessage.photo,
-            caption: photoMessage.caption
-        };
-
-        console.warn('注意: 正在使用 sendPhoto 直接发送消息，并返回 message_id 作为 prepared_message_id 的模拟。');
-        
-        const result = await callTelegramApi('sendPhoto', params);
-        const prepared_message_id = result.ok ? result.result.message_id : null;
-
-        if (prepared_message_id) {
-            res.json({ success: true, prepared_message_id });
-        } else {
-            res.status(500).json({ success: false, error: '无法发送图片消息' });
-        }
-    } catch (error) {
-        console.error('发送图片时出错:', error);
-        res.status(500).json({ success: false, error: '服务器内部错误' });
-    }
-});
-
 // API 路由：保存一条图文内联消息到 Telegram 平台
 app.post('/api/save-inline-photo', async (req, res) => {
     const { user_id } = req.body;
@@ -168,5 +131,5 @@ app.listen(port, () => {
     console.log(`✅ API 服务已启动`);
     console.log(`🔗 监听端口: http://localhost:${port}`);
     console.log('\n可用 API 路由:');
-    console.log(`  POST /api/prepare-message - 准备一条消息并返回 ID`);
+    console.log(`  POST /api/save-inline-photo - 保存一条图文内联消息到 Telegram 平台`);
 });

@@ -51,11 +51,14 @@
                 sendButton.disabled = true;
 
                 try {
-                    // 1. 调用后端 API，模拟“保存”图文消息到 TG 平台，并获取 msg_id
+                    // 检查用户数据是否可用
+                    const userId = tg.initDataUnsafe?.user?.id || 'unknown_user';
+                    
+                    // 1. 调用后端 API，模拟"保存"图文消息到 TG 平台，并获取 msg_id
                     const response = await fetch(`${API_BASE_URL}/api/save-inline-photo`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ user_id: tg.initDataUnsafe.user.id }) // 此接口需要 user_id 参数
+                        body: JSON.stringify({ user_id: userId }) // 此接口需要 user_id 参数
                     });
 
                     const data = await response.json();
