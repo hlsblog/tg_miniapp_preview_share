@@ -39,8 +39,30 @@ BOT_TOKEN=your_bot_token_here
 
 ### 3. 启动服务
 
+#### 常规启动
 ```bash
 npm start
+```
+
+#### 使用 PM2 启动（推荐用于生产环境）
+```bash
+# 安装 PM2（如果尚未安装）
+npm install -g pm2
+
+# 启动应用
+npm run pm2:start
+
+# 查看日志
+npm run pm2:logs
+
+# 停止应用
+npm run pm2:stop
+
+# 重启应用
+npm run pm2:restart
+
+# 删除应用
+npm run pm2:delete
 ```
 
 服务将在 http://localhost:3000 启动
@@ -92,6 +114,36 @@ const result = {
 1. 前端调用 `/api/save-inline-photo` 获取消息 ID
 2. 使用 `tgWebview.postEvent('web_app_send_prepared_message', false, { id: msgId })` 触发分享对话框
 3. 用户在对话框中选择聊天并发送消息
+
+### 分享事件监听
+
+您可以在前端监听分享事件来获知用户的操作结果：
+
+```javascript
+// 监听分享成功事件
+telegram.WebView.onEvent('prepared_message_sent', function(data) {
+    console.log('分享成功', data);
+    // 处理分享成功逻辑
+});
+
+// 监听分享取消事件  
+telegram.WebView.onEvent('prepared_message_failed', function(data) {
+    console.log('分享取消', data);
+    // 处理分享取消逻辑
+});
+
+// 监听分享失败事件
+telegram.WebView.onEvent('prepared_message_failed', function(data) {
+    console.log('分享失败', data);
+    // 处理分享失败逻辑
+});
+```
+
+这些事件可以帮助您：
+- 跟踪用户分享行为
+- 在分享成功后关闭 Web App
+- 在分享失败后显示错误提示
+- 记录分享统计信息
 
 ## 注意事项
 

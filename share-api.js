@@ -91,9 +91,6 @@ app.post('/api/save-inline-photo', async (req, res) => {
     };
 
     try {
-        // 模拟保存过程，生成一个伪造的 msg_id
-        const fakeMsgId = 'fake_prepared_msg_id_12345';
-        console.log(`模拟保存图文消息成功，伪造的 msg_id: ${fakeMsgId}`);
         //保存到tg服务器
         let rs = await callTelegramApi('savePreparedInlineMessage', {
             user_id: user_id,

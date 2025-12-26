@@ -46,6 +46,14 @@
                 return;
             }
 
+            window.Telegram.WebView.onEvent('prepared_message_sent', (event) => {
+                console.log('prepared_message_sent 事件触发:', event);
+                statusDiv.innerHTML += '<br>✅ 图文消息已成功发送！';
+            });
+            window.Telegram.WebView.onEvent('prepared_message_failed', (event) => {
+                console.log('prepared_message_failed 事件触发:', event);
+                statusDiv.innerHTML += '<br>❌ 图文消息发送失败！';
+            });
             sendButton.addEventListener('click', async () => {
                 statusDiv.textContent = '⏳ 正在准备图文消息...';
                 sendButton.disabled = true;
