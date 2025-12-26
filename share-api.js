@@ -80,7 +80,7 @@ app.post('/api/save-inline-photo', async (req, res) => {
 
     // 模拟的图文消息内容
     //生成随机id： 1 - 1000
-    const randomId = Math.floor(Math.random() * 1000) + 1;
+    const randomId = 237;
     const inlinePhotoResult = {
         type: 'photo',
         id: randomId.toString(), // 结果的唯一 ID
