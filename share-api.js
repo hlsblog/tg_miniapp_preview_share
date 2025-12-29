@@ -72,7 +72,7 @@ async function callTelegramApi(method, params) {
 
 // API 路由：保存一条图文内联消息到 Telegram 平台
 app.post('/api/save-inline-photo', async (req, res) => {
-    const { user_id } = req.body;
+    const { user_id, title, photo_url, shareLink } = req.body;
 
     if (!user_id) {
         return res.status(400).json({ success: false, error: 'user_id 是必填项' });
@@ -84,10 +84,10 @@ app.post('/api/save-inline-photo', async (req, res) => {
     const inlinePhotoResult = {
         type: 'photo',
         id: randomId.toString(), // 结果的唯一 ID
-        photo_url: `https://picsum.photos/id/${randomId}/600/400`,
-        thumbnail_url: `https://picsum.photos/id/${randomId}/80/80`,
-        caption: '这是通过 Mini App 准备分享的图片！',
-        description: '描述文案'
+        photo_url: photo_url,
+        thumbnail_url: photo_url,
+        caption: title || '',
+        description: ''
     };
 
     try {
@@ -107,7 +107,7 @@ app.post('/api/save-inline-photo', async (req, res) => {
                 description: inlinePhotoResult.description,
                 reply_markup: {
                     inline_keyboard: [
-                        [{ text: 'Open Game', url: 'https://t.me/hlsblogbot/hlsblog' }],
+                        [{ text: 'Open Game', url: shareLink }],
                     ],
                 },
             }
